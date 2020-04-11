@@ -3,6 +3,8 @@ package app_test
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -11,6 +13,10 @@ import (
 	"github.com/goofinator/hasher_nats_server/internal/init/startup"
 	"github.com/goofinator/hasher_nats_server/pkg"
 	"github.com/google/uuid"
+)
+
+const (
+	testDataFile = "main_test.txt"
 )
 
 var (
@@ -27,9 +33,6 @@ var (
 		Type:   pkg.DefaultMessageType,
 		Body:   []byte("message 1"),
 	}
-	replBody = []uint8{
-		0x5b, 0x22, 0x55, 0x45, 0x78, 0x56, 0x52, 0x77, 0x3d, 0x3d, 0x22,
-		0x2c, 0x22, 0x63, 0x47, 0x78, 0x31, 0x5a, 0x77, 0x3d, 0x3d, 0x22, 0x5d}
 )
 
 func TestProcessMessage(t *testing.T) {
@@ -53,35 +56,48 @@ func setProcessMessageExpectations(ns *mocks.MockNatsSession, err error) {
 
 func NewMatcherMessage(msg *pkg.Message) gomock.Matcher {
 	reply := &pkg.Message{
-		ID: msg.ID,
+		ID:   msg.ID,
+		Body: getTestBody(),
 	}
 	return &matcherMessage{msg: reply}
 }
 
+// some fields of reply are randomly generated
+// so we can't compare it strictly with something
+// and should provide some matcher
 type matcherMessage struct {
 	msg *pkg.Message
 }
 
 func (m *matcherMessage) Matches(x interface{}) bool {
 	msg, ok := x.(*pkg.Message)
-	if !ok {
-		return false
+	switch {
+	case !ok:
+		log.Fatal("fail to x.(*pkg.Message) in Matches")
+	case msg.Sender != serverUUID:
+		log.Println("msg.Sender != serverUUID")
+	case msg.Type != pkg.DefaultMessageType:
+		log.Println("msg.Type != pkg.DefaultMessageType")
+	case bytes.Compare(msg.Body, m.msg.Body) != 0:
+		log.Printf("msg body is not equal to specified in %q file", testDataFile)
+	case msg.ID == m.msg.ID || msg.ID == clientUUID || msg.ID == serverUUID:
+		log.Println("msg.ID should differ from clientUUID, serverUUID, recieved message ID")
+	default:
+		return true
 	}
-	if msg.Sender != serverUUID {
-		return false
-	}
-	if msg.Type != pkg.DefaultMessageType {
-		return false
-	}
-	if !bytes.Equal(msg.Body, replBody) {
-		return false
-	}
-	if msg.ID == m.msg.ID || msg.ID == clientUUID || msg.ID == serverUUID {
-		return false
-	}
-	return true
+	return false
 }
 
 func (m *matcherMessage) String() string {
 	return fmt.Sprintf("is a %v", m.msg)
+}
+
+func getTestBody() []byte {
+	tb, err := ioutil.ReadFile(testDataFile)
+	if err != nil {
+		log.Fatalf("can't open %q file", testDataFile)
+	}
+	result := make([]byte, 0)
+	fmt.Sscanf(string(tb), "%X", &result)
+	return result
 }
