@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/goofinator/hasher_nats_server/internal/api"
 	"github.com/goofinator/hasher_nats_server/internal/app"
 	"github.com/goofinator/hasher_nats_server/internal/init/startup"
 	"github.com/goofinator/hasher_nats_server/internal/remotes"
@@ -9,14 +10,14 @@ import (
 
 func main() {
 	iniData := startup.Configuration()
-	nc, ch := remotes.IniNats(iniData)
-	defer cleanup(nc, ch)
+	session := remotes.IniNats(iniData)
+	defer session.Close()
 
-	app.Process(ch)
+	app.Process(session, iniData)
 }
 
-func cleanup(nc *nats.Conn, ch chan<- *nats.Msg) {
-	nc.Drain()
-	nc.Close()
+func cleanup(connection *nats.EncodedConn, ch chan<- *api.Message) {
+	connection.Drain()
+	connection.Close()
 	close(ch)
 }

@@ -14,16 +14,14 @@ const (
 
 // IniData structure stores initial data to start a app
 type IniData struct {
-	URL        string
-	ChanelName string
-	Sender     uuid.UUID
+	URL    string
+	Sender uuid.UUID
 }
 
 // Configuration returns port to use obtained from user or DefaultPort
 func Configuration() *IniData {
 	iniData := &IniData{}
 	flag.StringVar(&iniData.URL, "url", DefaultURL, "url of nats service")
-	flag.StringVar(&iniData.ChanelName, "chanel", DefaultChanelName, "chanel to use")
 	flag.Parse()
 
 	iniData.Sender = uuid.New()

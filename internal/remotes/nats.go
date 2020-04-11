@@ -1,22 +1,61 @@
 package remotes
 
 import (
+	"fmt"
 	"log"
 
+	"github.com/goofinator/hasher_nats_server/internal/api"
 	"github.com/goofinator/hasher_nats_server/internal/init/startup"
 	"github.com/nats-io/nats.go"
 )
 
+// NatsSession contains the data using for nats communocation
+type natsSession struct {
+	Incoming     chan *api.Message
+	connection   *nats.EncodedConn
+	subscription *nats.Subscription
+}
+
 // IniNats connect to the nats server and recieve all messages into the chanel
-func IniNats(iniData *startup.IniData) (*nats.Conn, chan *nats.Msg) {
+func IniNats(iniData *startup.IniData) api.NatsSession {
+	session := &natsSession{}
+
 	nc, err := nats.Connect(iniData.URL)
 	if err != nil {
 		log.Fatalf("error on Connect: %s", err)
-
+	}
+	session.connection, err = nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	if err != nil {
+		log.Fatalf("error on Connect: %s", err)
 	}
 
-	ch := make(chan *nats.Msg)
+	session.Incoming = make(chan *api.Message)
 
-	nc.ChanSubscribe(iniData.ChanelName, ch)
-	return nc, ch
+	session.subscription, err = session.connection.BindRecvChan("worker.*.out", session.Incoming)
+	if err != nil {
+		log.Fatalf("error on Subscribe: %s", err)
+	}
+
+	return session
+}
+
+// Close closes subscription, drains and closes connection,
+// closes Incoming chanel
+func (ns *natsSession) Close() {
+	ns.subscription.Unsubscribe()
+	ns.connection.Drain()
+	ns.connection.Close()
+	close(ns.Incoming)
+}
+
+func (ns *natsSession) DataSource() <-chan *api.Message {
+	return ns.Incoming
+}
+
+// SendMessage sends message via nats
+func (ns *natsSession) SendMessage(subject string, msg *api.Message) error {
+	if err := ns.connection.Publish(subject, msg); err != nil {
+		return fmt.Errorf("error on SendMessage: %s", err)
+	}
+	return nil
 }
