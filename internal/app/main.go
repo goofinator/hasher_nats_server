@@ -11,6 +11,7 @@ import (
 	"github.com/goofinator/hasher_nats_server/internal/api"
 	"github.com/goofinator/hasher_nats_server/internal/init/startup"
 	"github.com/goofinator/hasher_nats_server/internal/utils"
+	"github.com/goofinator/hasher_nats_server/pkg"
 	"github.com/google/uuid"
 )
 
@@ -31,17 +32,17 @@ EXIT:
 }
 
 // ProcessMessage processes message and send response via session
-func ProcessMessage(session api.NatsSession, iniData *startup.IniData, msg *api.Message) {
+func ProcessMessage(session api.NatsSession, iniData *startup.IniData, msg *pkg.Message) {
 	hashes := utils.MakeHashes(msg.Body)
 	result, err := json.Marshal(hashes)
 	if err != nil {
 		result = make([]byte, 0)
 	}
 
-	reply := &api.Message{
+	reply := &pkg.Message{
 		Sender: iniData.Sender,
 		ID:     uuid.New(),
-		Type:   api.DefaultMessageType,
+		Type:   pkg.DefaultMessageType,
 		Body:   result,
 	}
 

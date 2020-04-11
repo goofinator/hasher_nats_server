@@ -3,24 +3,11 @@
 
 package api
 
-import "github.com/google/uuid"
-
-const (
-	// DefaultMessageType is a message Type used by this client
-	DefaultMessageType = 0
-)
-
-// Message describes nats message
-type Message struct {
-	Type   uint8
-	Body   []byte
-	ID     uuid.UUID
-	Sender uuid.UUID
-}
+import "github.com/goofinator/hasher_nats_server/pkg"
 
 // NatsSession wraps methods to manipulate nats session
 type NatsSession interface {
-	DataSource() <-chan *Message
+	DataSource() <-chan *pkg.Message
 	Close()
-	SendMessage(subject string, msg *Message) error
+	SendMessage(subject string, msg *pkg.Message) error
 }

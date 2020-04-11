@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	api "github.com/goofinator/hasher_nats_server/internal/api"
+	pkg "github.com/goofinator/hasher_nats_server/pkg"
 )
 
 // MockNatsSession is a mock of NatsSession interface
@@ -47,10 +47,10 @@ func (mr *MockNatsSessionMockRecorder) Close() *gomock.Call {
 }
 
 // DataSource mocks base method
-func (m *MockNatsSession) DataSource() <-chan *api.Message {
+func (m *MockNatsSession) DataSource() <-chan *pkg.Message {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DataSource")
-	ret0, _ := ret[0].(<-chan *api.Message)
+	ret0, _ := ret[0].(<-chan *pkg.Message)
 	return ret0
 }
 
@@ -61,7 +61,7 @@ func (mr *MockNatsSessionMockRecorder) DataSource() *gomock.Call {
 }
 
 // SendMessage mocks base method
-func (m *MockNatsSession) SendMessage(arg0 string, arg1 *api.Message) error {
+func (m *MockNatsSession) SendMessage(arg0 string, arg1 *pkg.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMessage", arg0, arg1)
 	ret0, _ := ret[0].(error)

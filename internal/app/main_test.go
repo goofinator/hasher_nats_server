@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/goofinator/hasher_nats_server/internal/api"
 	"github.com/goofinator/hasher_nats_server/internal/api/mocks"
 	. "github.com/goofinator/hasher_nats_server/internal/app"
 	"github.com/goofinator/hasher_nats_server/internal/init/startup"
+	"github.com/goofinator/hasher_nats_server/pkg"
 	"github.com/google/uuid"
 )
 
@@ -21,10 +21,10 @@ var (
 	}
 )
 var (
-	message = &api.Message{
+	message = &pkg.Message{
 		Sender: clientUUID,
 		ID:     uuid.New(),
-		Type:   api.DefaultMessageType,
+		Type:   pkg.DefaultMessageType,
 		Body:   []byte("message 1"),
 	}
 	replBody = []uint8{
@@ -51,26 +51,26 @@ func setProcessMessageExpectations(ns *mocks.MockNatsSession, err error) {
 		Return(err)
 }
 
-func NewMatcherMessage(msg *api.Message) gomock.Matcher {
-	reply := &api.Message{
+func NewMatcherMessage(msg *pkg.Message) gomock.Matcher {
+	reply := &pkg.Message{
 		ID: msg.ID,
 	}
 	return &matcherMessage{msg: reply}
 }
 
 type matcherMessage struct {
-	msg *api.Message
+	msg *pkg.Message
 }
 
 func (m *matcherMessage) Matches(x interface{}) bool {
-	msg, ok := x.(*api.Message)
+	msg, ok := x.(*pkg.Message)
 	if !ok {
 		return false
 	}
 	if msg.Sender != serverUUID {
 		return false
 	}
-	if msg.Type != api.DefaultMessageType {
+	if msg.Type != pkg.DefaultMessageType {
 		return false
 	}
 	if !bytes.Equal(msg.Body, replBody) {
