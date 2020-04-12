@@ -7,6 +7,7 @@ import (
 	"github.com/goofinator/hasher_nats_server/internal/api"
 	"github.com/goofinator/hasher_nats_server/internal/init/startup"
 	"github.com/goofinator/hasher_nats_server/pkg"
+	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 )
 
@@ -15,11 +16,12 @@ type natsSession struct {
 	Incoming     chan *pkg.Message
 	connection   *nats.EncodedConn
 	subscription *nats.Subscription
+	natsSettings *startup.NatsSettings
 }
 
 // IniNats connect to the nats server and recieve all messages into the chanel
 func IniNats(natsSettings *startup.NatsSettings) api.NatsSession {
-	session := &natsSession{}
+	session := &natsSession{natsSettings: natsSettings}
 
 	nc, err := nats.Connect(natsSettings.URL)
 	if err != nil {
@@ -38,6 +40,10 @@ func IniNats(natsSettings *startup.NatsSettings) api.NatsSession {
 	}
 
 	return session
+}
+
+func (ns *natsSession) UUID() uuid.UUID {
+	return ns.natsSettings.UUID
 }
 
 // Close closes subscription, drains and closes connection,

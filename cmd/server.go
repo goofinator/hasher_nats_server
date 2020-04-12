@@ -11,5 +11,5 @@ func main() {
 	session := web.IniNats(natsSettings)
 	defer session.Close()
 
-	app.Process(session, natsSettings)
+	app.Process(session)
 }

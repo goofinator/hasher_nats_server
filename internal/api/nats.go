@@ -3,11 +3,15 @@
 
 package api
 
-import "github.com/goofinator/hasher_nats_server/pkg"
+import (
+	"github.com/goofinator/hasher_nats_server/pkg"
+	"github.com/google/uuid"
+)
 
 // NatsSession wraps methods to manipulate nats session
 type NatsSession interface {
-	DataSource() <-chan *pkg.Message
 	Close()
+	DataSource() <-chan *pkg.Message
+	UUID() uuid.UUID
 	SendMessage(subject string, msg *pkg.Message) error
 }

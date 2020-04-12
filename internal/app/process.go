@@ -9,14 +9,13 @@ import (
 	"syscall"
 
 	"github.com/goofinator/hasher_nats_server/internal/api"
-	"github.com/goofinator/hasher_nats_server/internal/init/startup"
 	"github.com/goofinator/hasher_nats_server/internal/utils"
 	"github.com/goofinator/hasher_nats_server/pkg"
 	"github.com/google/uuid"
 )
 
 // Process performs main cycle
-func Process(session api.NatsSession, natsSettings *startup.NatsSettings) {
+func Process(session api.NatsSession) {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
@@ -24,7 +23,7 @@ EXIT:
 	for {
 		select {
 		case msg := <-session.DataSource():
-			go ProcessMessage(session, natsSettings, msg)
+			go ProcessMessage(session, msg)
 		case <-sigs:
 			break EXIT
 		}
@@ -32,7 +31,7 @@ EXIT:
 }
 
 // ProcessMessage processes message and send response via session
-func ProcessMessage(session api.NatsSession, natsSettings *startup.NatsSettings, msg *pkg.Message) {
+func ProcessMessage(session api.NatsSession, msg *pkg.Message) {
 	hashes := utils.Hash(msg.Body)
 	result, err := json.Marshal(hashes)
 	if err != nil {
@@ -40,7 +39,7 @@ func ProcessMessage(session api.NatsSession, natsSettings *startup.NatsSettings,
 	}
 
 	reply := &pkg.Message{
-		Sender: natsSettings.Sender,
+		Sender: session.UUID(),
 		ID:     uuid.New(),
 		Type:   pkg.DefaultMessageType,
 		Body:   result,

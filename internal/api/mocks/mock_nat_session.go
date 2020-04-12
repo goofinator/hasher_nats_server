@@ -9,6 +9,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	pkg "github.com/goofinator/hasher_nats_server/pkg"
+	uuid "github.com/google/uuid"
 )
 
 // MockNatsSession is a mock of NatsSession interface
@@ -72,4 +73,18 @@ func (m *MockNatsSession) SendMessage(arg0 string, arg1 *pkg.Message) error {
 func (mr *MockNatsSessionMockRecorder) SendMessage(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMessage", reflect.TypeOf((*MockNatsSession)(nil).SendMessage), arg0, arg1)
+}
+
+// UUID mocks base method
+func (m *MockNatsSession) UUID() uuid.UUID {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UUID")
+	ret0, _ := ret[0].(uuid.UUID)
+	return ret0
+}
+
+// UUID indicates an expected call of UUID
+func (mr *MockNatsSessionMockRecorder) UUID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UUID", reflect.TypeOf((*MockNatsSession)(nil).UUID))
 }

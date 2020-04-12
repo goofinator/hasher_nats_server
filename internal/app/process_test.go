@@ -11,7 +11,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/goofinator/hasher_nats_server/internal/api/mocks"
 	. "github.com/goofinator/hasher_nats_server/internal/app"
-	"github.com/goofinator/hasher_nats_server/internal/init/startup"
 	"github.com/goofinator/hasher_nats_server/pkg"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -22,11 +21,8 @@ const (
 )
 
 var (
-	clientUUID   = uuid.New()
-	serverUUID   = uuid.New()
-	natsSettings = &startup.NatsSettings{
-		Sender: serverUUID,
-	}
+	clientUUID = uuid.New()
+	serverUUID = uuid.New()
 )
 var (
 	message = &pkg.Message{
@@ -49,7 +45,7 @@ func TestProcessMessageSuccess(t *testing.T) {
 
 	setProcessMessageExpectations(t, ns, nil)
 
-	ProcessMessage(ns, natsSettings, message)
+	ProcessMessage(ns, message)
 	assert.Empty(t, logBuf.String())
 }
 
@@ -65,16 +61,21 @@ func TestProcessMessageFail(t *testing.T) {
 
 	setProcessMessageExpectations(t, ns, errors.New("some error"))
 
-	ProcessMessage(ns, natsSettings, message)
+	ProcessMessage(ns, message)
 	assert.Contains(t, logBuf.String(), string("error on SendMessage: some error\n"))
 }
 
 func setProcessMessageExpectations(t *testing.T, ns *mocks.MockNatsSession, err error) {
 	subject := fmt.Sprintf("worker.%s.in", clientUUID)
 
-	ns.EXPECT().
-		SendMessage(subject, NewMatcherMessage(t, message)).
-		Return(err)
+	gomock.InOrder(
+		ns.EXPECT().
+			UUID().
+			Return(serverUUID),
+		ns.EXPECT().
+			SendMessage(subject, NewMatcherMessage(t, message)).
+			Return(err),
+	)
 }
 
 func NewMatcherMessage(t *testing.T, msg *pkg.Message) gomock.Matcher {
