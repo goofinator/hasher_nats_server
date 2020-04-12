@@ -33,7 +33,7 @@ EXIT:
 
 // ProcessMessage processes message and send response via session
 func ProcessMessage(session api.NatsSession, iniData *startup.IniData, msg *pkg.Message) {
-	hashes := utils.MakeHashes(msg.Body)
+	hashes := utils.Hash(msg.Body)
 	result, err := json.Marshal(hashes)
 	if err != nil {
 		result = make([]byte, 0)

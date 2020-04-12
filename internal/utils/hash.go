@@ -2,8 +2,8 @@ package utils
 
 import "crypto/sha256"
 
-// MakeHashes make hashes from message
-func MakeHashes(message []byte) [][]byte {
+// Hash make hashes from message
+func Hash(message []byte) [][]byte {
 	result := make([][]byte, 0)
 	for i := byte(0); i < 100; i++ {
 		h := sha256.New()
