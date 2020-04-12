@@ -35,8 +35,8 @@ var (
 
 func TestProcessMessageSuccess(t *testing.T) {
 	//catch log
-	logBuf := &bytes.Buffer{}
-	log.SetOutput(logBuf)
+	logBuf := bytes.Buffer{}
+	log.SetOutput(&logBuf)
 
 	//You need a NatsSession mock to process the request
 	mockController := gomock.NewController(t)
@@ -51,8 +51,8 @@ func TestProcessMessageSuccess(t *testing.T) {
 
 func TestProcessMessageFail(t *testing.T) {
 	//catch log
-	logBuf := &bytes.Buffer{}
-	log.SetOutput(logBuf)
+	logBuf := bytes.Buffer{}
+	log.SetOutput(&logBuf)
 
 	//You need a NatsSession mock to process the request
 	mockController := gomock.NewController(t)
