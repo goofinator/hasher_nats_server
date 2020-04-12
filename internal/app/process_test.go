@@ -83,7 +83,7 @@ func NewMatcherMessage(t *testing.T, msg pkg.Message) gomock.Matcher {
 		ID:   msg.ID,
 		Body: getTestBody(),
 	}
-	return &matcherMessage{
+	return matcherMessage{
 		msg: reply,
 		t:   t,
 	}
@@ -97,7 +97,7 @@ type matcherMessage struct {
 	t   *testing.T
 }
 
-func (m *matcherMessage) Matches(x interface{}) bool {
+func (m matcherMessage) Matches(x interface{}) bool {
 	msg, ok := x.(pkg.Message)
 	if !ok {
 		m.t.Errorf("fail to x.(pkg.Message) in Matches")
@@ -118,7 +118,7 @@ func (m *matcherMessage) Matches(x interface{}) bool {
 	return false
 }
 
-func (m *matcherMessage) String() string {
+func (m matcherMessage) String() string {
 	return fmt.Sprintf("is a %v", m.msg)
 }
 
