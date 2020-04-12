@@ -12,7 +12,7 @@ import (
 
 // NatsSession contains the data using for nats communocation
 type natsSession struct {
-	Incoming     chan *pkg.Message
+	Incoming     chan pkg.Message
 	connection   *nats.EncodedConn
 	subscription *nats.Subscription
 	natsSettings *startup.NatsSettings
@@ -31,7 +31,7 @@ func IniNats(natsSettings *startup.NatsSettings) (api.NatsSession, error) {
 		return nil, fmt.Errorf("error on Connect: %s", err)
 	}
 
-	session.Incoming = make(chan *pkg.Message)
+	session.Incoming = make(chan pkg.Message)
 
 	session.subscription, err = session.connection.BindRecvChan("worker.*.out", session.Incoming)
 	if err != nil {
@@ -54,12 +54,12 @@ func (ns *natsSession) Close() {
 	close(ns.Incoming)
 }
 
-func (ns *natsSession) DataSource() <-chan *pkg.Message {
+func (ns *natsSession) DataSource() <-chan pkg.Message {
 	return ns.Incoming
 }
 
 // SendMessage sends message via nats
-func (ns *natsSession) SendMessage(subject string, msg *pkg.Message) error {
+func (ns *natsSession) SendMessage(subject string, msg pkg.Message) error {
 	if err := ns.connection.Publish(subject, msg); err != nil {
 		return fmt.Errorf("error on SendMessage: %s", err)
 	}

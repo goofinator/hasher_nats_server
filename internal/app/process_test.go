@@ -25,7 +25,7 @@ var (
 	serverUUID = uuid.New()
 )
 var (
-	message = &pkg.Message{
+	message = pkg.Message{
 		Sender: clientUUID,
 		ID:     uuid.New(),
 		Type:   pkg.DefaultMessageType,
@@ -78,8 +78,8 @@ func setProcessMessageExpectations(t *testing.T, ns *mocks.MockNatsSession, err 
 	)
 }
 
-func NewMatcherMessage(t *testing.T, msg *pkg.Message) gomock.Matcher {
-	reply := &pkg.Message{
+func NewMatcherMessage(t *testing.T, msg pkg.Message) gomock.Matcher {
+	reply := pkg.Message{
 		ID:   msg.ID,
 		Body: getTestBody(),
 	}
@@ -93,14 +93,14 @@ func NewMatcherMessage(t *testing.T, msg *pkg.Message) gomock.Matcher {
 // so we can't compare it strictly with something
 // and should provide some matcher
 type matcherMessage struct {
-	msg *pkg.Message
+	msg pkg.Message
 	t   *testing.T
 }
 
 func (m *matcherMessage) Matches(x interface{}) bool {
-	msg, ok := x.(*pkg.Message)
+	msg, ok := x.(pkg.Message)
 	if !ok {
-		m.t.Errorf("fail to x.(*pkg.Message) in Matches")
+		m.t.Errorf("fail to x.(pkg.Message) in Matches")
 		return false
 	}
 	switch {

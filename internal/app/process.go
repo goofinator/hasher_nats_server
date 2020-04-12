@@ -31,14 +31,14 @@ EXIT:
 }
 
 // ProcessMessage processes message and send response via session
-func ProcessMessage(session api.NatsSession, msg *pkg.Message) {
+func ProcessMessage(session api.NatsSession, msg pkg.Message) {
 	hashes := utils.Hash(msg.Body)
 	result, err := json.Marshal(hashes)
 	if err != nil {
 		result = make([]byte, 0)
 	}
 
-	reply := &pkg.Message{
+	reply := pkg.Message{
 		Sender: session.UUID(),
 		ID:     uuid.New(),
 		Type:   pkg.DefaultMessageType,

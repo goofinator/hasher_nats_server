@@ -11,7 +11,7 @@ import (
 // NatsSession wraps methods to manipulate nats session
 type NatsSession interface {
 	Close()
-	DataSource() <-chan *pkg.Message
+	DataSource() <-chan pkg.Message
 	UUID() uuid.UUID
-	SendMessage(subject string, msg *pkg.Message) error
+	SendMessage(subject string, msg pkg.Message) error
 }

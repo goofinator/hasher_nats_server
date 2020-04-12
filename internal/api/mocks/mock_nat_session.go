@@ -48,10 +48,10 @@ func (mr *MockNatsSessionMockRecorder) Close() *gomock.Call {
 }
 
 // DataSource mocks base method
-func (m *MockNatsSession) DataSource() <-chan *pkg.Message {
+func (m *MockNatsSession) DataSource() <-chan pkg.Message {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DataSource")
-	ret0, _ := ret[0].(<-chan *pkg.Message)
+	ret0, _ := ret[0].(<-chan pkg.Message)
 	return ret0
 }
 
@@ -62,7 +62,7 @@ func (mr *MockNatsSessionMockRecorder) DataSource() *gomock.Call {
 }
 
 // SendMessage mocks base method
-func (m *MockNatsSession) SendMessage(arg0 string, arg1 *pkg.Message) error {
+func (m *MockNatsSession) SendMessage(arg0 string, arg1 pkg.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMessage", arg0, arg1)
 	ret0, _ := ret[0].(error)
