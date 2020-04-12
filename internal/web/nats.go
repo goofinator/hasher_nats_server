@@ -2,7 +2,6 @@ package web
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/goofinator/hasher_nats_server/internal/api"
 	"github.com/goofinator/hasher_nats_server/internal/init/startup"
@@ -20,26 +19,26 @@ type natsSession struct {
 }
 
 // IniNats connect to the nats server and recieve all messages into the chanel
-func IniNats(natsSettings *startup.NatsSettings) api.NatsSession {
+func IniNats(natsSettings *startup.NatsSettings) (api.NatsSession, error) {
 	session := &natsSession{natsSettings: natsSettings}
 
 	nc, err := nats.Connect(natsSettings.URL)
 	if err != nil {
-		log.Fatalf("error on Connect: %s", err)
+		return nil, fmt.Errorf("error on Connect: %s", err)
 	}
 	session.connection, err = nats.NewEncodedConn(nc, nats.JSON_ENCODER)
 	if err != nil {
-		log.Fatalf("error on Connect: %s", err)
+		return nil, fmt.Errorf("error on Connect: %s", err)
 	}
 
 	session.Incoming = make(chan *pkg.Message)
 
 	session.subscription, err = session.connection.BindRecvChan("worker.*.out", session.Incoming)
 	if err != nil {
-		log.Fatalf("error on Subscribe: %s", err)
+		return nil, fmt.Errorf("error on Subscribe: %s", err)
 	}
 
-	return session
+	return session, nil
 }
 
 func (ns *natsSession) UUID() uuid.UUID {
