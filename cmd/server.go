@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	iniData := startup.New()
-	session := web.IniNats(iniData)
+	natsSettings := startup.New()
+	session := web.IniNats(natsSettings)
 	defer session.Close()
 
-	app.Process(session, iniData)
+	app.Process(session, natsSettings)
 }

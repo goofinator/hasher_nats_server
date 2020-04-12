@@ -16,7 +16,7 @@ import (
 )
 
 // Process performs main cycle
-func Process(session api.NatsSession, iniData *startup.IniData) {
+func Process(session api.NatsSession, natsSettings *startup.NatsSettings) {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
@@ -24,7 +24,7 @@ EXIT:
 	for {
 		select {
 		case msg := <-session.DataSource():
-			go ProcessMessage(session, iniData, msg)
+			go ProcessMessage(session, natsSettings, msg)
 		case <-sigs:
 			break EXIT
 		}
@@ -32,7 +32,7 @@ EXIT:
 }
 
 // ProcessMessage processes message and send response via session
-func ProcessMessage(session api.NatsSession, iniData *startup.IniData, msg *pkg.Message) {
+func ProcessMessage(session api.NatsSession, natsSettings *startup.NatsSettings, msg *pkg.Message) {
 	hashes := utils.Hash(msg.Body)
 	result, err := json.Marshal(hashes)
 	if err != nil {
@@ -40,7 +40,7 @@ func ProcessMessage(session api.NatsSession, iniData *startup.IniData, msg *pkg.
 	}
 
 	reply := &pkg.Message{
-		Sender: iniData.Sender,
+		Sender: natsSettings.Sender,
 		ID:     uuid.New(),
 		Type:   pkg.DefaultMessageType,
 		Body:   result,

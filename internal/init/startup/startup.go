@@ -6,25 +6,25 @@ import (
 	"github.com/google/uuid"
 )
 
-// Default values of IniData fields
+// Default values of NatsSettings fields
 const (
 	DefaultURL        = "nats://localhost:4222"
 	DefaultChanelName = "hasher"
 )
 
-// IniData structure stores initial data to start a app
-type IniData struct {
+// NatsSettings structure stores initial data to start a app
+type NatsSettings struct {
 	URL    string
 	Sender uuid.UUID
 }
 
-// New returns IniData obtained from user or DefaultPort
-func New() *IniData {
-	iniData := &IniData{}
-	flag.StringVar(&iniData.URL, "url", DefaultURL, "url of nats service")
+// New returns NatsSettings obtained from user or DefaultPort
+func New() *NatsSettings {
+	natsSettings := &NatsSettings{}
+	flag.StringVar(&natsSettings.URL, "url", DefaultURL, "url of nats service")
 	flag.Parse()
 
-	iniData.Sender = uuid.New()
+	natsSettings.Sender = uuid.New()
 
-	return iniData
+	return natsSettings
 }

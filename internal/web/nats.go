@@ -18,10 +18,10 @@ type natsSession struct {
 }
 
 // IniNats connect to the nats server and recieve all messages into the chanel
-func IniNats(iniData *startup.IniData) api.NatsSession {
+func IniNats(natsSettings *startup.NatsSettings) api.NatsSession {
 	session := &natsSession{}
 
-	nc, err := nats.Connect(iniData.URL)
+	nc, err := nats.Connect(natsSettings.URL)
 	if err != nil {
 		log.Fatalf("error on Connect: %s", err)
 	}

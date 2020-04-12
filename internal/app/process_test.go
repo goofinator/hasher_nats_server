@@ -22,9 +22,9 @@ const (
 )
 
 var (
-	clientUUID = uuid.New()
-	serverUUID = uuid.New()
-	iniData    = &startup.IniData{
+	clientUUID   = uuid.New()
+	serverUUID   = uuid.New()
+	natsSettings = &startup.NatsSettings{
 		Sender: serverUUID,
 	}
 )
@@ -49,7 +49,7 @@ func TestProcessMessageSuccess(t *testing.T) {
 
 	setProcessMessageExpectations(t, ns, nil)
 
-	ProcessMessage(ns, iniData, message)
+	ProcessMessage(ns, natsSettings, message)
 	assert.Empty(t, logBuf.String())
 }
 
@@ -65,7 +65,7 @@ func TestProcessMessageFail(t *testing.T) {
 
 	setProcessMessageExpectations(t, ns, errors.New("some error"))
 
-	ProcessMessage(ns, iniData, message)
+	ProcessMessage(ns, natsSettings, message)
 	assert.Contains(t, logBuf.String(), string("error on SendMessage: some error\n"))
 }
 
