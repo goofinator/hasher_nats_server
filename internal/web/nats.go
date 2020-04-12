@@ -20,7 +20,7 @@ type natsSession struct {
 
 // IniNats connect to the nats server and recieve all messages into the chanel
 func IniNats(natsSettings startup.NatsSettings) (api.NatsSession, error) {
-	session := &natsSession{natsSettings: natsSettings}
+	session := natsSession{natsSettings: natsSettings}
 
 	nc, err := nats.Connect(natsSettings.URL)
 	if err != nil {
@@ -41,25 +41,25 @@ func IniNats(natsSettings startup.NatsSettings) (api.NatsSession, error) {
 	return session, nil
 }
 
-func (ns *natsSession) UUID() uuid.UUID {
+func (ns natsSession) UUID() uuid.UUID {
 	return ns.natsSettings.UUID
 }
 
 // Close closes subscription, drains and closes connection,
 // closes Incoming chanel
-func (ns *natsSession) Close() {
+func (ns natsSession) Close() {
 	ns.subscription.Unsubscribe()
 	ns.connection.Drain()
 	ns.connection.Close()
 	close(ns.Incoming)
 }
 
-func (ns *natsSession) DataSource() <-chan pkg.Message {
+func (ns natsSession) DataSource() <-chan pkg.Message {
 	return ns.Incoming
 }
 
 // SendMessage sends message via nats
-func (ns *natsSession) SendMessage(subject string, msg pkg.Message) error {
+func (ns natsSession) SendMessage(subject string, msg pkg.Message) error {
 	if err := ns.connection.Publish(subject, msg); err != nil {
 		return fmt.Errorf("error on SendMessage: %s", err)
 	}
