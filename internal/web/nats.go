@@ -1,4 +1,4 @@
-package remotes
+package web
 
 import (
 	"fmt"
