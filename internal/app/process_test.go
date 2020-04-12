@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	testDataFile = "main_test.txt"
+	testDataFile = "process_test.txt"
 )
 
 var (
