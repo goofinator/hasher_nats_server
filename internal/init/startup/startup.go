@@ -18,8 +18,8 @@ type IniData struct {
 	Sender uuid.UUID
 }
 
-// Configuration returns port to use obtained from user or DefaultPort
-func Configuration() *IniData {
+// New returns IniData obtained from user or DefaultPort
+func New() *IniData {
 	iniData := &IniData{}
 	flag.StringVar(&iniData.URL, "url", DefaultURL, "url of nats service")
 	flag.Parse()

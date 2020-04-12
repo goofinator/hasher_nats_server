@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	iniData := startup.Configuration()
+	iniData := startup.New()
 	session := web.IniNats(iniData)
 	defer session.Close()
 
