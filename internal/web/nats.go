@@ -15,11 +15,11 @@ type natsSession struct {
 	Incoming     chan pkg.Message
 	connection   *nats.EncodedConn
 	subscription *nats.Subscription
-	natsSettings *startup.NatsSettings
+	natsSettings startup.NatsSettings
 }
 
 // IniNats connect to the nats server and recieve all messages into the chanel
-func IniNats(natsSettings *startup.NatsSettings) (api.NatsSession, error) {
+func IniNats(natsSettings startup.NatsSettings) (api.NatsSession, error) {
 	session := &natsSession{natsSettings: natsSettings}
 
 	nc, err := nats.Connect(natsSettings.URL)
